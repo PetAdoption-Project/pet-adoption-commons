@@ -14,6 +14,7 @@
 
     <modules>
         <module>user-service-commons</module>
+        <module>security-commons</module>
     </modules>
     <dependencies>
         <dependency>
