@@ -14,7 +14,7 @@
 
     <modules>
         <module>user-service-commons</module>
-        <module>security-commons</module>
+        <module>service-spring-boot-starter</module>
     </modules>
     <dependencies>
         <dependency>

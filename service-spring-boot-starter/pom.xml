@@ -9,12 +9,21 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>security-commons</artifactId>
+    <artifactId>service-spring-boot-starter</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <logstash-encoder.version>8.0</logstash-encoder.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-encoder.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
