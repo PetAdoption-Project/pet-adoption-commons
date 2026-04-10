@@ -17,6 +17,8 @@ public class UserDTO {
     private UUID id;
     private String keycloakId;
     private String email;
+    private String firstName;
+    private String lastName;
     private Role role;
     private Instant createdAt;
 }
