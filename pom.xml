@@ -25,6 +25,20 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/PetAdoption-Project/pet-adoption-commons</url>
+        </repository>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:PetAdoption-Project/pet-adoption-commons.git</connection>
+        <developerConnection>scm:git:git@github.com:PetAdoption-Project/pet-adoption-commons.git</developerConnection>
+        <url>https://github.com/PetAdoption-Project/pet-adoption-commons</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>

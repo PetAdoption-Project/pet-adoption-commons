@@ -1,0 +1,79 @@
+name: Publish to GitHub Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+
+      - name: Read current version
+        run: |
+          CURRENT=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "CURRENT_VERSION=$CURRENT" >> $GITHUB_ENV
+          echo "Current version: $CURRENT"
+
+      - name: Calculate release version
+        run: |
+          BASE=${CURRENT_VERSION%-SNAPSHOT}
+          IFS='.' read -r major minor patch <<< "$BASE"
+
+          case "${{ github.event.inputs.bump }}" in
+            major) major=$((major + 1)); minor=0; patch=0 ;;
+            minor) minor=$((minor + 1)); patch=0 ;;
+            patch) patch=$((patch + 1)) ;;
+          esac
+
+          RELEASE="$major.$minor.$patch"
+          echo "RELEASE_VERSION=$RELEASE" >> $GITHUB_ENV
+          echo "Release version: $RELEASE"
+
+      - name: Set release version
+        run: mvn versions:set -DnewVersion=${{ env.RELEASE_VERSION }} -DgenerateBackupPoms=false
+
+      - name: Deploy to GitHub Packages
+        run: mvn deploy -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag release
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag v${{ env.RELEASE_VERSION }}
+          git push origin v${{ env.RELEASE_VERSION }}
+
+      - name: Bump to next SNAPSHOT
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ env.RELEASE_VERSION }}"
+          NEXT="$major.$minor.$((patch + 1))-SNAPSHOT"
+          mvn versions:set -DnewVersion=$NEXT -DgenerateBackupPoms=false
+          git commit -am "Next dev version $NEXT"
+          git push origin
