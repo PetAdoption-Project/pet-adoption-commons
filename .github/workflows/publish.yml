@@ -13,12 +13,14 @@ on:
           - minor
           - major
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -75,5 +77,5 @@ jobs:
           IFS='.' read -r major minor patch <<< "${{ env.RELEASE_VERSION }}"
           NEXT="$major.$minor.$((patch + 1))-SNAPSHOT"
           mvn versions:set -DnewVersion=$NEXT -DgenerateBackupPoms=false
-          git commit -am "Next dev version $NEXT"
-          git push origin
+          git commit -am "[skip ci] bump version to $NEXT"
+          git push origin HEAD
